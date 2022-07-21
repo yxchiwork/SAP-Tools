@@ -20,26 +20,6 @@ declare -r ARCH="${PLATFORM,,}-amd64"
 declare -r TARGETDIR="$HOME/bin"
 declare -r LICENCE="tools.hana.ondemand.com/developer-license-3_1.txt"
 
-confirm_licence_acceptance() {
-
-  # Ensure licence acceptance
-
-  local proceed
-  echo "Proceed (with Enter) only if you accept the SAP Developer Licence 3.1"
-  echo -n "(see https://$LICENCE) ..."
-  # shellcheck disable=2034
-#  read -r proceed
-
-}
-
-dequarantine() {
-
-  # Remove any Apple quarantine
-
-  local file=$1
-  xattr -d com.apple.quarantine "$file" 2> /dev/null || true
-
-}
 
 retrieve() {
 
@@ -96,7 +76,6 @@ main() {
   # - make sure the user confirms acceptance of the licence
   if [[ $testmode = false ]]; then
     [[ ! -d "$TARGETDIR" ]] && mkdir "$TARGETDIR"
-    confirm_licence_acceptance
   fi
 
   # Set up temporary directory and move into it
@@ -108,9 +87,6 @@ main() {
     exit 1
   }
 
-  # Dequarantine if on macOS
-  [[ $PLATFORM =~ Darwin ]] && dequarantine "$tempdir/btp"
-
   # Determine version
   ver="$(get_version "$tempdir")"
   echo "Version is $ver"
@@ -119,8 +95,7 @@ main() {
   # set symlink
   if [[ $testmode = false ]]; then
     cd "$TARGETDIR" \
-      && mv "$tempdir/btp" "./btp-$ver" \
-      && ln -f -s "btp-$ver" btp
+      && mv "$tempdir/btp" "bin/btp"
   fi
 
   # Clean up by removing temporary directory
