@@ -25,7 +25,7 @@ retrieve() {
       --extract \
       --gunzip \
       --strip-components 1 \
-      "$ARCH/btp"
+      "$ARCH/btp" \
     && mv btp bin/btp
 
 }
